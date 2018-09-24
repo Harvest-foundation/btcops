@@ -1,0 +1,15 @@
+docker:
+  image: "g4s8/rultor:latest"
+env:
+  MAVEN_OPTS: "-Xmx1g"
+merge:
+  script:
+    - "mvn help:system clean install -B --quiet"
+    - "mvn clean --quiet"
+  fast-forward: "no"
+release:
+  script:
+    - 'command sudo make VERSION=$tag'
+architect:
+  - "g4s8"
+

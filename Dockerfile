@@ -13,5 +13,4 @@ FROM g4s8/alpine:jre-8
 WORKDIR /app
 COPY --from=build /build/target/service.jar /app/service.jar
 COPY --from=build /build/target/deps /app/deps
-CMD ["-Dfile.encoding=UTF-8",  "-cp", "service.jar:deps/*", "wtf.harvest.btcops.Bot", "--port=80"]
-EXPOSE 80
+CMD ["-Dfile.encoding=UTF-8",  "-cp", "service.jar:deps/*", "wtf.harvest.btcops.Bot"]

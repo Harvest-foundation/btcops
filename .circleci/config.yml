@@ -1,0 +1,9 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: g4s8/rultor:latest
+    steps:
+      - checkout
+      - run: mvn help:system clean install -B
+
