@@ -5,5 +5,5 @@ jobs:
       - image: g4s8/rultor:latest
     steps:
       - checkout
-      - run: mvn help:system clean install -B
+      - run: mvn help:system -P qulice clean install -B
 
