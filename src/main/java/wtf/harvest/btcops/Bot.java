@@ -110,7 +110,7 @@ public final class Bot {
     private void checkBalance(final NetworkParameters net,
         final DataSource data, final Wallet wallet) throws SQLException {
         final JdbcSession session = new JdbcSession(data).autocommit(false);
-        final List<Balance> balances = session.sql("SELECT request, address FROM ioop_btc_inputs WHERE state = 'waiting'")
+        final List<Balance> balances = session.sql("SELECT request, address FROM ioop_btc_inputs WHERE status = 'waiting'")
             .select(
                 new ListOutcome<>(
                     rset -> new Balance(
