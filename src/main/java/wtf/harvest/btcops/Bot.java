@@ -197,7 +197,7 @@ public final class Bot {
         final JdbcSession session = new JdbcSession(data).autocommit(false);
         final List<Balance> balances = session.sql(
             // @checkstyle LineLength (1 line)
-            "SELECT request, address FROM ioop_btc_inputs WHERE state = 'waiting'"
+            "SELECT request, address FROM ioop_btc_inputs WHERE status = 'waiting'"
         ).select(
             new ListOutcome<>(
                 rset -> new Balance(
