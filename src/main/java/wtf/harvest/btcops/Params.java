@@ -14,14 +14,16 @@ final class Params {
      * Environment.
      */
     private final Map<String, String> envs;
+
     /**
      * Properties.
      */
     private final Properties props;
+
     /**
      * Arguments.
      */
-    private final List<String> args;
+    private final Arguments args;
 
     Params(final List<String> args) {
         this(System.getenv(), System.getProperties(), args);
@@ -31,7 +33,7 @@ final class Params {
         final Properties props, final List<String> args) {
         this.envs = Collections.unmodifiableMap(envs);
         this.props = props;
-        this.args = Collections.unmodifiableList(args);
+        this.args = new Arguments(Collections.unmodifiableList(args));
     }
 
     /**
@@ -51,10 +53,9 @@ final class Params {
     /**
      * Argument.
      *
-     * @param pos Position
      * @return Argument value
      */
-    public String arg(final int pos) {
-        return this.args.get(pos);
+    public Arguments arg() {
+        return this.args;
     }
 }

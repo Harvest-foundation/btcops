@@ -52,6 +52,8 @@ import wtf.harvest.db.PooledDataSource;
  * @since 1.0
  * @todo #2:30min Reduce this class' DataAbstractionCoupling. It is currently
  *  at 21, which is way more than the max allowed of 7.
+ * @todo #3:30min Use command line arguments `discovery` and `net` to configure
+ *  bot on start up. For more details see #3.
  * @checkstyle ClassDataAbstractionCoupling (2 lines)
  */
 public final class Bot {
@@ -59,12 +61,12 @@ public final class Bot {
     /**
      * Data folder.
      */
-    private static final File DATA = new File("/tmp/data");
+    private final File data;
 
     /**
      * Wallet file.
      */
-    private static final File WALLET = new File(Bot.DATA, "btcops.wlt");
+    private final File wfile;
 
     /**
      * Bot parameters.
@@ -79,8 +81,10 @@ public final class Bot {
     /**
      * Ctor.
      * @param params Bot parameters
+     * @param data Data directory
+     * @param wfile Wallet file
      */
-    Bot(final Params params) {
+    Bot(final Params params, final File data, final File wfile) {
         this.params = params;
         this.http = new OkHttpClient.Builder()
             .addInterceptor(
@@ -88,6 +92,21 @@ public final class Bot {
                     message -> Logger.info("HTTP", message)
                 ).setLevel(HttpLoggingInterceptor.Level.BODY)
             ).build();
+        this.data = data;
+        this.wfile = wfile;
+    }
+
+    /**
+     * Primary ctor.
+     *
+     * @param params Bot parameters.
+     */
+    Bot(final Params params) {
+        this(
+            params,
+            new File(params.arg().data()),
+            new File(params.arg().data(), "btcops.wlt")
+        );
     }
 
     /**
@@ -107,20 +126,20 @@ public final class Bot {
      * @throws IOException If something goes wrong
      */
     private Wallet walletFrom(final NetworkParameters net) throws IOException {
-        if (!Bot.WALLET.exists() || Bot.WALLET.isDirectory()) {
-            Bot.WALLET.delete();
+        if (!this.wfile.exists() || this.wfile.isDirectory()) {
+            this.wfile.delete();
             Wallet.fromWatchingKey(
                 net,
                 DeterministicKey.deserializeB58(
                     this.params.env("BTC_DPUB"),
                     net
                 )
-            ).saveToFile(Bot.WALLET);
+            ).saveToFile(this.wfile);
         }
         try {
-            return Wallet.loadFromFile(Bot.WALLET);
+            return Wallet.loadFromFile(this.wfile);
         } catch (final UnreadableWalletException err) {
-            throw new IOException("Failed to read wallet", err);
+            throw new IOException("Failed to read wfile", err);
         }
     }
 
@@ -130,7 +149,7 @@ public final class Bot {
      */
     private void run() throws Exception {
         final NetworkParameters net = TestNet3Params.get();
-        final BlockStore store = new SPVBlockStore(net, Bot.blockchain());
+        final BlockStore store = new SPVBlockStore(net, this.blockchain());
         final BlockChain chain = new BlockChain(net, store);
         final PeerGroup peers = new PeerGroup(net, chain);
         peers.addPeerDiscovery(
@@ -144,23 +163,24 @@ public final class Bot {
         chain.addWallet(wlt);
         peers.start();
         peers.downloadBlockChain();
-        final DataSource data = new PooledDataSource(this.params.env()).value();
-        this.checkInputs(data, wlt);
-        this.checkBalance(net, data, wlt);
+        final DataSource dbsource = new PooledDataSource(this.params.env())
+            .value();
+        this.checkInputs(dbsource, wlt);
+        this.checkBalance(net, dbsource, wlt);
     }
 
     /**
      * Pre-validation checks.
-     * @param data Datasource
+     * @param dbsource Datasource
      * @param wallet Receiving wallet
      * @throws SQLException If error accessing database
      * @throws IOException If error accessing network
      */
     private void checkInputs(
-        final DataSource data,
+        final DataSource dbsource,
         final Wallet wallet
     ) throws SQLException, IOException {
-        final JdbcSession session = new JdbcSession(data).autocommit(false);
+        final JdbcSession session = new JdbcSession(dbsource).autocommit(false);
         final List<Request> requests =
             session.sql(
                 // @checkstyle LineLength (1 line)
@@ -181,20 +201,20 @@ public final class Bot {
             request.assign(session, wallet);
             request.notify(this.http, telegram);
         }
-        wallet.saveToFile(Bot.WALLET);
+        wallet.saveToFile(this.wfile);
         session.commit();
     }
 
     /**
-     * Checks wallet's balance.
+     * Checks wfile's balance.
      * @param net Network
-     * @param data Datasource
+     * @param dbsource Datasource
      * @param wallet Wallet
      * @throws SQLException If error accessing database
      */
     private void checkBalance(final NetworkParameters net,
-        final DataSource data, final Wallet wallet) throws SQLException {
-        final JdbcSession session = new JdbcSession(data).autocommit(false);
+        final DataSource dbsource, final Wallet wallet) throws SQLException {
+        final JdbcSession session = new JdbcSession(dbsource).autocommit(false);
         final List<Balance> balances = session.sql(
             // @checkstyle LineLength (1 line)
             "SELECT request, address FROM ioop_btc_inputs WHERE status = 'waiting'"
@@ -214,7 +234,7 @@ public final class Bot {
         );
         for (final Balance balance : balances) {
             Logger.info(this, "Balance %s", balance);
-            balance.accept(data);
+            balance.accept(dbsource);
         }
     }
 
@@ -222,8 +242,8 @@ public final class Bot {
      * The blockchain file.
      * @return The blockchain file
      */
-    private static File blockchain() {
-        final File chain = new File(Bot.DATA, "btcops.chain");
+    private File blockchain() {
+        final File chain = new File(this.data, "btcops.chain");
         if (!chain.exists() || chain.isDirectory()) {
             Logger.info(
                 Bot.class,
