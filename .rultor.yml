@@ -4,7 +4,7 @@ env:
   MAVEN_OPTS: "-Xmx1g"
 merge:
   script:
-    - "mvn help:system clean install -B --quiet"
+    - "mvn help:system -P qulice clean install -B --quiet"
     - "mvn clean --quiet"
   fast-forward: "no"
 release:
