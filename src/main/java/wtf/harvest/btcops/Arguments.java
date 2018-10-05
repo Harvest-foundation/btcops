@@ -16,12 +16,13 @@
  */
 package wtf.harvest.btcops;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 
 /**
  * Command line arguments.
@@ -45,22 +46,16 @@ public final class Arguments {
     private static final String P_DISCOVERY = "discovery";
 
     /**
-     * Exception description.
+     * Command line arguments.
      */
-    private static final String EXCEPTION =
-        "Required command line argument %s is absent";
-
-    /**
-     * Map of arguments and their values.
-     */
-    private final Map<String, List<String>> args;
+    private final CommandLine args;
 
     /**
      * Constructs an {@code Arguments} with the specified arguments.
      * @param args Arguments
      */
-    Arguments(final Iterable<String> args) {
-        this.args = Arguments.asMap(args);
+    Arguments(final String... args) {
+        this.args = Arguments.parse(args);
     }
 
     /**
@@ -69,12 +64,8 @@ public final class Arguments {
      * @throws IllegalStateException If net argument is missing
      */
     public String net() {
-        if (!this.args.containsKey(Arguments.P_NET)) {
-            throw new IllegalStateException(
-                String.format(Arguments.EXCEPTION, Arguments.P_NET)
-            );
-        }
-        return this.args.get(Arguments.P_NET).get(0);
+        this.check(Arguments.P_NET);
+        return this.args.getOptionValue(Arguments.P_NET);
     }
 
     /**
@@ -83,12 +74,8 @@ public final class Arguments {
      * @throws IllegalStateException If net argument is missing
      */
     public String data() {
-        if (!this.args.containsKey(Arguments.P_DATA)) {
-            throw new IllegalStateException(
-                String.format(Arguments.EXCEPTION, Arguments.P_DATA)
-            );
-        }
-        return this.args.get(Arguments.P_DATA).get(0);
+        this.check(Arguments.P_DATA);
+        return this.args.getOptionValue(Arguments.P_DATA);
     }
 
     /**
@@ -97,40 +84,46 @@ public final class Arguments {
      * @throws IllegalStateException If net argument is missing
      */
     public List<String> discovery() {
-        if (!this.args.containsKey(Arguments.P_DISCOVERY)) {
-            throw new IllegalStateException(
-                String.format(Arguments.EXCEPTION, Arguments.P_DISCOVERY)
-            );
-        }
-        return this.args.get(Arguments.P_DISCOVERY);
+        this.check(Arguments.P_DISCOVERY);
+        return Arrays.asList(this.args.getOptionValues(Arguments.P_DISCOVERY));
     }
 
     /**
-     * Convert the provided arguments into a Map.
+     * Convert the provided arguments into commons.cli CommandLine object.
      * @param args Arguments to parse.
-     * @return Map A map containing all the arguments and their values.
-     * @throws IllegalStateException If an argument doesn't match with the
-     *  expected format which is {@code --([a-z\-]+)(=.+)?}.
+     * @return CommandLine object with parsed arguments.
+     * @throws IllegalStateException If failed to parse arguments.
      */
-    @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
-    private static Map<String, List<String>> asMap(
-        final Iterable<String> args) {
-        final Map<String, List<String>> map = new HashMap<>(0);
-        final Pattern ptn = Pattern.compile("--([a-z\\-]+)(=.+)?");
-        for (final String arg : args) {
-            final Matcher matcher = ptn.matcher(arg);
-            if (!matcher.matches()) {
-                throw new IllegalStateException(
-                    String.format("can't parse this argument: '%s'", arg)
-                );
-            }
-            final String value = matcher.group(2);
-            map.computeIfAbsent(matcher.group(1), k -> new ArrayList<>(0));
-            if (value != null) {
-                map.get(matcher.group(1)).add(value.substring(1));
-            }
+    private static CommandLine parse(final String... args) {
+        final Options options = new Options();
+        //@checkstyle LineLengthCheck (3 lines)
+        options.addOption("", Arguments.P_NET, true, "Net arg: can be either main or test3, if main then bot should use main network, test3 otherwise ");
+        options.addOption("", Arguments.P_DATA, true, "Data arg: data directory");
+        options.addOption("", Arguments.P_DISCOVERY, true, "Discovery args: host name (list) of peers discovery");
+        final CommandLineParser parser = new DefaultParser();
+        try {
+            return parser.parse(options, args);
+        } catch (final ParseException ex) {
+            throw new IllegalStateException(
+                "Failed to parse command line arguments", ex
+            );
         }
-        return map;
+    }
+
+    /**
+     * Checks if argument is present in {@link this.args}.
+     * @param arg Argument to check
+     * @throws IllegalStateException If arg is absent
+     */
+    private void check(final String arg) {
+        if (!this.args.hasOption(arg)) {
+            throw new IllegalStateException(
+                String.format(
+                    "Required command line argument %s is absent",
+                    arg
+                )
+            );
+        }
     }
 }
 

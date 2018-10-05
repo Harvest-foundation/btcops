@@ -25,15 +25,15 @@ final class Params {
      */
     private final Arguments args;
 
-    Params(final List<String> args) {
+    Params(final String... args) {
         this(System.getenv(), System.getProperties(), args);
     }
 
     Params(final Map<String, String> envs,
-        final Properties props, final List<String> args) {
+        final Properties props, final String... args) {
         this.envs = Collections.unmodifiableMap(envs);
         this.props = props;
-        this.args = new Arguments(Collections.unmodifiableList(args));
+        this.args = new Arguments(args);
     }
 
     /**

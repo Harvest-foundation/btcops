@@ -43,7 +43,6 @@ import org.cactoos.io.LengthOf;
 import org.cactoos.io.OutputTo;
 import org.cactoos.io.ResourceOf;
 import org.cactoos.io.TeeInput;
-import org.cactoos.list.ListOf;
 import wtf.harvest.db.PooledDataSource;
 
 /**
@@ -116,7 +115,7 @@ public final class Bot {
      */
     @SuppressWarnings("PMD.ProhibitPublicStaticMethods")
     public static void main(final String... args) throws Exception {
-        new Bot(new Params(new ListOf<>(args))).run();
+        new Bot(new Params(args)).run();
     }
 
     /**

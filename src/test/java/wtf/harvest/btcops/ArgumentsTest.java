@@ -16,7 +16,6 @@
  */
 package wtf.harvest.btcops;
 
-import org.cactoos.iterable.IterableOf;
 import org.cactoos.list.ListOf;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.collection.IsIterableContainingInAnyOrder;
@@ -43,8 +42,7 @@ public final class ArgumentsTest {
     public void returnsCorrectNetValue() {
         final String net = "test3";
         MatcherAssert.assertThat(
-            new Arguments(new IterableOf<>(String.format("--net=%s", net)))
-                .net(),
+            new Arguments(String.format("--net=%s", net)).net(),
             new IsEqual<>(net)
         );
     }
@@ -53,8 +51,7 @@ public final class ArgumentsTest {
     public void returnsCorrectDataValue() {
         final String data = "/var/btcops";
         MatcherAssert.assertThat(
-            new Arguments(new IterableOf<>(String.format("--data=%s", data)))
-                .data(),
+            new Arguments(String.format("--data=%s", data)).data(),
             new IsEqual<>(data)
         );
     }
@@ -67,11 +64,9 @@ public final class ArgumentsTest {
         final String param = "--discovery=%s";
         MatcherAssert.assertThat(
             new Arguments(
-                new IterableOf<>(
-                    String.format(param, first),
-                    String.format(param, second),
-                    String.format(param, third)
-                )
+                String.format(param, first),
+                String.format(param, second),
+                String.format(param, third)
             ).discovery(),
             new IsIterableContainingInAnyOrder<>(
                 new ListOf<>(
@@ -89,7 +84,7 @@ public final class ArgumentsTest {
         this.thrown.expectMessage(
             "Required command line argument net is absent"
         );
-        new Arguments(new IterableOf<>()).net();
+        new Arguments().net();
     }
 
     @Test
@@ -98,7 +93,7 @@ public final class ArgumentsTest {
         this.thrown.expectMessage(
             "Required command line argument data is absent"
         );
-        new Arguments(new IterableOf<>()).data();
+        new Arguments().data();
     }
 
     @Test
@@ -107,7 +102,7 @@ public final class ArgumentsTest {
         this.thrown.expectMessage(
             "Required command line argument discovery is absent"
         );
-        new Arguments(new IterableOf<>()).discovery();
+        new Arguments().discovery();
     }
 
 }
