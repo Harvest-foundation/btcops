@@ -81,12 +81,13 @@ final class Request {
      */
     public void assign(final JdbcSession session, final Wallet wallet)
         throws SQLException {
-        // @checkstyle LineLengthCheck (1 line)
-        session.sql("UPDATE ioop_requests SET status = 'assigned'::ioop_status WHERE id = ?")
+        session
+            // @checkstyle LineLengthCheck (1 line)
+            .sql("UPDATE ioop_requests SET status = 'assigned'::ioop_status WHERE id = ?")
             .set(this.rid)
             .update(Outcome.VOID);
-        // @checkstyle LineLengthCheck (1 line)
-        session.sql("INSERT INTO ioop_btc_inputs (request, address) VALUES (?, ?)")
+        session
+            .sql("INSERT INTO ioop_btc_inputs (request, address) VALUES (?, ?)")
             .set(this.rid)
             .set(this.addr)
             .insert(Outcome.VOID);
