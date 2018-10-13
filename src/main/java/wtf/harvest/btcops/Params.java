@@ -1,13 +1,27 @@
+/*
+ * Copyright (c) 2018 Harvest foundation
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to read
+ * the Software only. Permissions is hereby NOT GRANTED to use, copy, modify,
+ * merge, publish, distribute, sublicense, and/or sell copies of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 package wtf.harvest.btcops;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 /**
- *
- * @since
+ * Application parameters.
+ * @since 2.0
  */
 final class Params {
     /**
@@ -16,28 +30,30 @@ final class Params {
     private final Map<String, String> envs;
 
     /**
-     * Properties.
-     */
-    private final Properties props;
-
-    /**
      * Arguments.
      */
     private final Arguments args;
 
+    /**
+     * Ctor.
+     * @param args Command line arguments
+     */
     Params(final String... args) {
-        this(System.getenv(), System.getProperties(), args);
+        this(System.getenv(), args);
     }
 
-    Params(final Map<String, String> envs,
-        final Properties props, final String... args) {
+    /**
+     * Primary ctor.
+     * @param envs Environment
+     * @param args Command line arguments
+     */
+    Params(final Map<String, String> envs, final String... args) {
         this.envs = Collections.unmodifiableMap(envs);
-        this.props = props;
         this.args = new Arguments(args);
     }
 
     /**
-     * Get environment.
+     * Get environment variable by name.
      *
      * @param name Variable name
      * @return Variable value
@@ -46,6 +62,11 @@ final class Params {
         return this.envs.get(name);
     }
 
+    /**
+     * Get environment map.
+     *
+     * @return Map with env params
+     */
     public Map<String, String> env() {
         return this.envs;
     }
