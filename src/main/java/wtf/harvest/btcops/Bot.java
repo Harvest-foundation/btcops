@@ -18,13 +18,12 @@
 package wtf.harvest.btcops;
 
 import com.jcabi.jdbc.JdbcSession;
-import com.jcabi.jdbc.ListOutcome;
 import com.jcabi.log.Logger;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.SQLException;
-import java.util.List;
+import java.util.Map;
 import javax.sql.DataSource;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -43,13 +42,15 @@ import org.cactoos.io.LengthOf;
 import org.cactoos.io.OutputTo;
 import org.cactoos.io.ResourceOf;
 import org.cactoos.io.TeeInput;
+import wtf.harvest.btcops.db.PgPendingRequests;
+import wtf.harvest.btcops.db.PgWaitingRequests;
 import wtf.harvest.db.PooledDataSource;
 
 /**
  * Bot entry point.
  *
  * @since 1.0
- * @todo #2:30min Reduce this class' DataAbstractionCoupling. It is currently
+ * @todo #6:30min Reduce this class' DataAbstractionCoupling. It is currently
  *  at 21, which is way more than the max allowed of 7.
  * @todo #3:30min Use command line arguments `discovery` and `net` to configure
  *  bot on start up. For more details see #3.
@@ -180,23 +181,9 @@ public final class Bot {
         final Wallet wallet
     ) throws SQLException, IOException {
         final JdbcSession session = new JdbcSession(dbsource).autocommit(false);
-        final List<Request> requests =
-            session.sql(
-                // @checkstyle LineLength (1 line)
-                "SELECT ops.id, ops.amount, links.ref AS telegram FROM ioop_requests AS ops JOIN links ON ops.author = links.profile_id WHERE ops.name = 'deposit' AND ops.token = 'BTC' AND ops.status = 'pending' AND links.rel = 'telegram'"
-            ).select(
-                new ListOutcome<>(
-                    rset -> new Request(
-                        rset.getLong(1),
-                        wallet.freshReceiveAddress(),
-                        rset.getBigDecimal(2),
-                        // @checkstyle MagicNumber (1 line)
-                        rset.getLong(3)
-                    )
-                )
-            );
         final String telegram = this.params.env("HV_TELEGRAM_HOST");
-        for (final Request request : requests) {
+        for (final Request request
+            : new PgPendingRequests(dbsource).get(wallet)) {
             request.assign(session, wallet);
             request.notify(this.http, telegram);
         }
@@ -210,28 +197,22 @@ public final class Bot {
      * @param dbsource Datasource
      * @param wallet Wallet
      * @throws SQLException If error accessing database
+     * @throws IOException When smth wrong
      */
-    private void checkBalance(final NetworkParameters net,
-        final DataSource dbsource, final Wallet wallet) throws SQLException {
-        final JdbcSession session = new JdbcSession(dbsource).autocommit(false);
-        final List<Balance> balances = session.sql(
-            // @checkstyle LineLength (1 line)
-            "SELECT request, address FROM ioop_btc_inputs WHERE status = 'waiting'"
-        ).select(
-            new ListOutcome<>(
-                rset -> new Balance(
-                    rset.getLong(1),
-                    new BigDecimal(
-                        wallet.getBalance(
-                            new AddressBalance(
-                                Address.fromBase58(net, rset.getString(2))
-                            )
-                        ).toPlainString()
-                    )
+    private void checkBalance(final NetworkParameters net, final DataSource
+        dbsource, final Wallet wallet) throws SQLException, IOException {
+        for (final Map.Entry<Long, String> request
+            : new PgWaitingRequests(dbsource).get().entrySet()) {
+            final Balance balance = new Balance(
+                request.getKey(),
+                new BigDecimal(
+                    wallet.getBalance(
+                        new AddressBalance(
+                            Address.fromBase58(net, request.getValue())
+                        )
+                    ).toPlainString()
                 )
-            )
-        );
-        for (final Balance balance : balances) {
+            );
             Logger.info(this, "Balance %s", balance);
             balance.accept(dbsource);
         }

@@ -36,7 +36,7 @@ import org.bitcoinj.wallet.Wallet;
  *
  * @since 2.0
  */
-final class Request {
+public final class Request {
     /**
      * Request id.
      */
@@ -65,7 +65,7 @@ final class Request {
      * @param telegram Telegram id
      * @checkstyle ParameterNumberCheck (4 lines)
      */
-    Request(final long rid, final Address addr, final BigDecimal amount,
+    public Request(final long rid, final Address addr, final BigDecimal amount,
         final long telegram) {
         this.rid = rid;
         this.addr = addr;
