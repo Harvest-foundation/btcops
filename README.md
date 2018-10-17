@@ -86,8 +86,6 @@ API to check balance on address or total wallet balance.
      "--port=80", \
      "--discovery=testnet-seed.bitcoin.petertodd.org", \
      "--discovery=testnet-seed.bluematt.me", \
-     "--discovery=testnet-seed.bitcoin.schildbach.de", \
      "--data=/var/btcops", \
      "--net=test3" \
- ]
- ```
+ ] ```
