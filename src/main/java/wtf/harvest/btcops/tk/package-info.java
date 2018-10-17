@@ -16,7 +16,6 @@
  */
 
 /**
- * Database.
- * @since 2.0
+ * Web takes.
  */
-package wtf.harvest.btcops.db;
+package wtf.harvest.btcops.tk;

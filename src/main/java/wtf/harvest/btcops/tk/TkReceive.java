@@ -14,22 +14,43 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package wtf.harvest.btcops;
+package wtf.harvest.btcops.tk;
 
 import java.io.IOException;
+import javax.json.Json;
 import org.bitcoinj.wallet.Wallet;
+import org.takes.Request;
+import org.takes.Response;
+import org.takes.Take;
+import org.takes.rs.RsJson;
 
 /**
- * Pending requests.
- * @since 2.0
+ * Receive take.
+ *
+ * @since 1.0
  */
-public interface PendingRequests {
+final class TkReceive implements Take {
 
     /**
-     * Returns pending requests.
-     * @param wallet Wallet to retrieve receive address from
-     * @return Iterable requests.
-     * @throws IOException If smth went wrong
+     * Wallet.
      */
-    Iterable<Request> get(Wallet wallet) throws IOException;
+    private final Wallet wlt;
+
+    /**
+     * Ctor.
+     *
+     * @param wallet Bitcoin wallet
+     */
+    TkReceive(final Wallet wallet) {
+        this.wlt = wallet;
+    }
+
+    @Override
+    public Response act(final Request req) throws IOException {
+        return new RsJson(
+            Json.createObjectBuilder()
+                .add("address", this.wlt.freshReceiveAddress().toBase58())
+                .build()
+        );
+    }
 }

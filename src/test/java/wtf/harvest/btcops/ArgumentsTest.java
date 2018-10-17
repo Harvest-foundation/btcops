@@ -16,6 +16,8 @@
  */
 package wtf.harvest.btcops;
 
+import java.io.File;
+import org.bitcoinj.params.TestNet3Params;
 import org.cactoos.list.ListOf;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.collection.IsIterableContainingInAnyOrder;
@@ -43,7 +45,7 @@ public final class ArgumentsTest {
         final String net = "test3";
         MatcherAssert.assertThat(
             new Arguments(String.format("--net=%s", net)).net(),
-            new IsEqual<>(net)
+            new IsEqual<>(TestNet3Params.get())
         );
     }
 
@@ -52,7 +54,7 @@ public final class ArgumentsTest {
         final String data = "/var/btcops";
         MatcherAssert.assertThat(
             new Arguments(String.format("--data=%s", data)).data(),
-            new IsEqual<>(data)
+            new IsEqual<>(new File(data))
         );
     }
 
@@ -104,5 +106,4 @@ public final class ArgumentsTest {
         );
         new Arguments().discovery();
     }
-
 }

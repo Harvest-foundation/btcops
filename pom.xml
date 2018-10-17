@@ -10,7 +10,7 @@
     <artifactId>parent</artifactId>
     <version>1.1.0</version>
   </parent>
-  <description>Harvest foundation Bitcoin operator bot</description>
+  <description>Bitcoin wallet operations service</description>
   <url>https://github.com/Harvest-foundation/btcops</url>
   <inceptionYear>2018</inceptionYear>
   <organization>
@@ -35,11 +35,6 @@
       <groupId>org.bitcoinj</groupId>
       <artifactId>bitcoinj-core</artifactId>
       <version>0.14.7</version>
-    </dependency>
-    <dependency>
-      <groupId>com.squareup.okhttp3</groupId>
-      <artifactId>logging-interceptor</artifactId>
-      <version>3.9.1</version>
     </dependency>
     <dependency>
       <groupId>commons-cli</groupId>
@@ -93,8 +88,11 @@
             <configuration>
               <license>file:${basedir}/LICENSE.txt</license>
               <excludes>
-                <exclude>dependencies:org.takes:takes</exclude>
                 <exclude>dependencies:com.jcabi:jcabi-urn</exclude>
+                <exclude>dependencies:wtf.harvest:db</exclude>
+                <exclude>dependencies:com.jcabi:jcabi-jdbc</exclude>
+                <exclude>dependencies:com.squareup.okhttp3:okhttp</exclude>
+                <exclude>dependencies:com.g4s8:cryptocactoos</exclude>
                 <exclude>dependencies:io.sentry:sentry</exclude>
                 <exclude>dependencies:com.g4s8:matchers-json</exclude>
                 <exclude>checkstyle:.*\.blockchain</exclude>
@@ -104,7 +102,7 @@
                 -->
                 <exclude>checkstyle:.*/src/main/java/wtf/harvest/btcops/AddressBalance.java</exclude>
                 <exclude>pmd:.*/src/main/java/wtf/harvest/btcops/AddressBalance.java</exclude>
-                <exclude>findbugs:wtf.harvest.btcops.Bot</exclude>
+                <exclude>findbugs:wtf.harvest.btcops.BtcOps</exclude>
                 <exclude>findbugs:wtf.harvest.btcops.AddressBalance$1</exclude>
               </excludes>
             </configuration>

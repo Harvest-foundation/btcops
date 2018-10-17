@@ -16,6 +16,7 @@
  */
 package wtf.harvest.btcops;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 import org.apache.commons.cli.CommandLine;
@@ -23,6 +24,9 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.bitcoinj.core.NetworkParameters;
+import org.bitcoinj.params.MainNetParams;
+import org.bitcoinj.params.TestNet3Params;
 
 /**
  * Command line arguments.
@@ -46,6 +50,11 @@ public final class Arguments {
     private static final String P_DISCOVERY = "discovery";
 
     /**
+     * Web service port.
+     */
+    private static final String P_PORT = "port";
+
+    /**
      * Command line arguments.
      */
     private final CommandLine args;
@@ -63,9 +72,20 @@ public final class Arguments {
      * @return Net argument
      * @throws IllegalStateException If net argument is missing
      */
-    public String net() {
+    public NetworkParameters net() {
         this.check(Arguments.P_NET);
-        return this.args.getOptionValue(Arguments.P_NET);
+        final String net = this.args.getOptionValue(Arguments.P_NET);
+        final NetworkParameters params;
+        if ("test3".equals(net)) {
+            params = TestNet3Params.get();
+        } else if ("main".equals(net)) {
+            params = MainNetParams.get();
+        } else {
+            throw new IllegalStateException(
+                String.format("Unsupported net param: %s", net)
+            );
+        }
+        return params;
     }
 
     /**
@@ -73,9 +93,9 @@ public final class Arguments {
      * @return Net argument
      * @throws IllegalStateException If net argument is missing
      */
-    public String data() {
+    public File data() {
         this.check(Arguments.P_DATA);
-        return this.args.getOptionValue(Arguments.P_DATA);
+        return new File(this.args.getOptionValue(Arguments.P_DATA));
     }
 
     /**
@@ -86,6 +106,16 @@ public final class Arguments {
     public List<String> discovery() {
         this.check(Arguments.P_DISCOVERY);
         return Arrays.asList(this.args.getOptionValues(Arguments.P_DISCOVERY));
+    }
+
+    /**
+     * Web service port.
+     *
+     * @return Port number
+     */
+    public int port() {
+        this.check(Arguments.P_PORT);
+        return Integer.parseInt(this.args.getOptionValue(Arguments.P_PORT));
     }
 
     /**
@@ -100,6 +130,7 @@ public final class Arguments {
         options.addOption("", Arguments.P_NET, true, "Net arg: can be either main or test3, if main then bot should use main network, test3 otherwise ");
         options.addOption("", Arguments.P_DATA, true, "Data arg: data directory");
         options.addOption("", Arguments.P_DISCOVERY, true, "Discovery args: host name (list) of peers discovery");
+        options.addOption("", Arguments.P_PORT, true, "Web service port");
         final CommandLineParser parser = new DefaultParser();
         try {
             return parser.parse(options, args);

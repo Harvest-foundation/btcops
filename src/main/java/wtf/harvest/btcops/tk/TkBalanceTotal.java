@@ -14,21 +14,47 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package wtf.harvest.btcops;
+package wtf.harvest.btcops.tk;
 
 import java.io.IOException;
-import java.util.Map;
+import java.math.BigDecimal;
+import javax.json.Json;
+import org.bitcoinj.wallet.Wallet;
+import org.takes.Request;
+import org.takes.Response;
+import org.takes.Take;
+import org.takes.rs.RsJson;
 
 /**
- * Waiting requests.
- * @since 2.0
+ * Total balance take.
+ *
+ * @since 1.0
  */
-public interface WaitingRequests {
+final class TkBalanceTotal implements Take {
 
     /**
-     * Returns waiting requests.
-     * @return Map with requests ids and addresses.
-     * @throws IOException If smth went wrong
+     * Wallet.
      */
-    Map<Long, String> get() throws IOException;
+    private final Wallet wlt;
+
+    /**
+     * Ctor.
+     *
+     * @param wallet Bitcoin wallet
+     */
+    TkBalanceTotal(final Wallet wallet) {
+        this.wlt = wallet;
+    }
+
+    @Override
+    public Response act(final Request req) throws IOException {
+        return new RsJson(
+            Json.createObjectBuilder()
+                .add(
+                    "balance",
+                    new BigDecimal(this.wlt.getBalance().toPlainString())
+                        .toString()
+                ).build()
+        );
+    }
 }

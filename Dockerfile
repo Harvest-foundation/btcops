@@ -13,4 +13,15 @@ FROM g4s8/alpine:jre-8
 WORKDIR /app
 COPY --from=build /build/target/service.jar /app/service.jar
 COPY --from=build /build/target/deps /app/deps
-CMD ["-Dfile.encoding=UTF-8",  "-cp", "service.jar:deps/*", "wtf.harvest.btcops.Bot"]
+EXPOSE 80
+CMD [ \
+    "-Dfile.encoding=UTF-8",  \
+    "-cp", "service.jar:deps/*", \
+    "wtf.harvest.btcops.BtcOps", \
+    "--port=80", \
+    "--discovery=testnet-seed.bitcoin.petertodd.org", \
+    "--discovery=testnet-seed.bluematt.me", \
+    "--discovery=testnet-seed.bitcoin.schildbach.de", \
+    "--data=/var/btcops", \
+    "--net=test3" \
+]
