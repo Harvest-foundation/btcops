@@ -78,6 +78,7 @@ API to check balance on address or total wallet balance.
   - `--data` - data directory where blockchain and wallet file will be stored
 
 *Example configuration:*
+```Dockerfile
  CMD [ \
      "-Dfile.encoding=UTF-8",  \
      "-cp", "service.jar:deps/*", \
@@ -89,3 +90,4 @@ API to check balance on address or total wallet balance.
      "--data=/var/btcops", \
      "--net=test3" \
  ]
+ ```
