@@ -136,7 +136,8 @@ public final class BtcOps {
         peers.downloadBlockChain();
         new FtCli(
             new TkApp(wlt),
-            String.format("--port=%d --threads=4", this.params.arg().port())
+            String.format("--port=%d", this.params.arg().port()),
+            "--threads=4"
         ).start(Exit.NEVER);
     }
 }
