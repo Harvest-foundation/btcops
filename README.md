@@ -7,6 +7,7 @@ It provides simple API for most common wallet operations: (send, receive and che
 [![Managed by Zerocracy](https://www.0crat.com/badge/CAWJH9K0X.svg)](https://www.0crat.com/p/CAWJH9K0X)
 [![DevOps By Rultor.com](http://www.rultor.com/b/Harvest-foundation/btcops)](http://www.rultor.com/p/Harvest-foundation/btcops)
 
+[![CircleCI](https://circleci.com/gh/Harvest-foundation/btcops/tree/master.svg?style=svg)](https://circleci.com/gh/Harvest-foundation/btcops/tree/master)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/Harvest-foundation/btcops/blob/master/LICENSE.txt)
 [![PDD status](http://www.0pdd.com/svg?name=Harvest-foundation/btcops)](http://www.0pdd.com/p?name=Harvest-foundation/btcops)
 
