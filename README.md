@@ -3,6 +3,13 @@
 Bitcoin wallet operations service.
 It provides simple API for most common wallet operations: (send, receive and check balance).
 
+[![EO principles respected here](http://www.elegantobjects.org/badge.svg)](http://www.elegantobjects.org)
+[![Managed by Zerocracy](https://www.0crat.com/badge/CAWJH9K0X.svg)](https://www.0crat.com/p/CAWJH9K0X)
+[![DevOps By Rultor.com](http://www.rultor.com/b/Harvest-foundation/btcops)](http://www.rultor.com/p/Harvest-foundation/btcops)
+
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/Harvest-foundation/btcops/blob/master/LICENSE.txt)
+[![PDD status](http://www.0pdd.com/svg?name=Harvest-foundation/btcops)](http://www.0pdd.com/p?name=Harvest-foundation/btcops)
+
 ## API
 
 ### Send BTC

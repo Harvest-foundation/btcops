@@ -1,6 +1,6 @@
 FROM g4s8/alpine:jdk-8 as build
 MAINTAINER Kirill <g4s8.public@gmail.com>
-LABEL Description="Harvest BTC operations bot"
+LABEL Description="BTC operations wallet API"
 ARG version="1.0-SNAPSHOT"
 WORKDIR /build
 COPY pom.xml ./pom.xml
