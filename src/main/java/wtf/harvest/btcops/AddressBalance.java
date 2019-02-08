@@ -48,7 +48,7 @@ import org.bitcoinj.wallet.CoinSelector;
 public class AddressBalance implements CoinSelector {
 
     private final Address addressToQuery;
-
+asdf
     public AddressBalance(Address addressToQuery) {
         this.addressToQuery = addressToQuery;
     }
